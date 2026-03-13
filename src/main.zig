@@ -1,4 +1,6 @@
 const std = @import("std");
+const locale = @import("locale.zig");
+const messages = @import("messages.zig");
 
 /// A simple joke utility that does only one thing — after launching,
 /// it outputs the phrase "I love you!" to the console.
@@ -14,13 +16,24 @@ pub fn main() !void {
     var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
     const stdout = &stdout_writer.interface;
 
+    // Get the System Locale or default to en_US
+    const lang = locale.getLocale(allocator) catch |err| switch (err) {
+        error.OutOfMemory => return err,
+        else => try allocator.dupe(u8, "en_US"),
+    };
+    defer allocator.free(lang);
+
+    // Get the Message by the System Locale
+    const message = messages.getMessageByLocale(lang);
+
+    // Get the arguments
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
 
     if (args.len > 1) {
-        try stdout.print("I love you, {s}!\n", .{args[1]});
+        try stdout.print("{s}, {s}!\n", .{ message, args[1] });
     } else {
-        try stdout.print("I love you!\n", .{});
+        try stdout.print("{s}!\n", .{message});
     }
 
     try stdout.flush();
