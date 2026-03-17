@@ -1,6 +1,9 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const locale = @import("locale.zig");
 const messages = @import("messages.zig");
+
+const CP_UTF8 = 65001;
 
 /// A simple joke utility that does only one thing — after launching,
 /// it outputs the phrase "I love you!" to the console.
@@ -29,6 +32,10 @@ pub fn main() !void {
     // Get the arguments
     const args = try std.process.argsAlloc(allocator);
     defer std.process.argsFree(allocator, args);
+
+    if (builtin.os.tag == .windows) {
+        _ = std.os.windows.kernel32.SetConsoleOutputCP(CP_UTF8);
+    }
 
     if (args.len > 1) {
         try stdout.print("{s}, {s}!\n", .{ message, args[1] });

@@ -74,7 +74,7 @@ pub fn getWindowsLocale(allocator: Allocator) LocaleError![]u8 {
         const utf16_len: usize = @intCast(result);
         var locale_str: [LOCALE_NAME_MAX_LENGTH]u8 = undefined;
         const utf8_len = std.unicode.utf16LeToUtf8(&locale_str, locale[0..utf16_len]) catch unreachable;
-        const slice = locale_str[0..utf8_len];
+        const slice = locale_str[0 .. utf8_len - 1]; // remove :0 terminator of string
         std.mem.replaceScalar(u8, slice, '-', '_');
         return try allocator.dupe(u8, slice);
     }
