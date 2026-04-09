@@ -22,7 +22,6 @@ const release_targets = [_]TargetQuery{
 
 const FileExtension = enum {
     zip,
-    @"tar.xz",
     @"tar.gz",
 };
 
@@ -60,6 +59,7 @@ pub fn build(b: *std.Build) void {
 
     { // zig build release
         const release_step = b.step("release", "Build release binaries");
+        var compressed_artifacts: std.StringArrayHashMapUnmanaged(std.Build.LazyPath) = .empty;
         for (release_targets) |release_target| {
             const resolved_target = b.resolveTargetQuery(release_target);
             const exe_release = b.addExecutable(.{
@@ -72,13 +72,53 @@ pub fn build(b: *std.Build) void {
                 }),
             });
 
-            const dir_name = b.fmt("{t}-{t}", .{
-                resolved_target.result.cpu.arch,
-                resolved_target.result.os.tag,
-            });
-            const install_dir = std.Build.InstallDir{ .custom = dir_name };
-            const release_cmd = b.addInstallArtifact(exe_release, .{ .dest_dir = .{ .override = install_dir } });
-            release_step.dependOn(&release_cmd.step);
+            const is_windows = release_target.os_tag == .windows;
+            const exe_name = b.fmt("{s}{s}", .{ exe.name, resolved_target.result.exeFileExt() });
+
+            const extensions: []const FileExtension = if (is_windows) &.{.zip} else &.{.@"tar.gz"};
+            for (extensions) |extension| {
+                const file_name = b.fmt("love-{t}-{t}.{t}", .{
+                    resolved_target.result.cpu.arch,
+                    resolved_target.result.os.tag,
+                    extension,
+                });
+
+                const compress_cmd = std.Build.Step.Run.create(b, "compress artifact");
+                compress_cmd.clearEnvironment();
+                compress_cmd.step.max_rss = switch (extension) {
+                    .zip => 160 * 1024 * 1024, // 160 MiB
+                    .@"tar.gz" => 16 * 1024 * 1024, // 12 MiB
+                };
+
+                switch (extension) {
+                    .zip => {
+                        compress_cmd.addArgs(&.{ "7z", "a", "-mx=9" });
+                        compressed_artifacts.putNoClobber(b.allocator, file_name, compress_cmd.addOutputFileArg(file_name)) catch @panic("OOM");
+                        compress_cmd.addArtifactArg(exe_release);
+                    },
+                    .@"tar.gz",
+                    => {
+                        compress_cmd.setEnvironmentVariable("XZ_OPT", "-9");
+                        compress_cmd.addArgs(&.{ "tar", "caf" });
+                        compressed_artifacts.putNoClobber(b.allocator, file_name, compress_cmd.addOutputFileArg(file_name)) catch @panic("OOM");
+                        compress_cmd.addPrefixedDirectoryArg("-C", exe_release.getEmittedBinDirectory());
+                        compress_cmd.addArg(exe_name);
+                        compress_cmd.addArgs(&.{
+                            "--sort=name",
+                            "--numeric-owner",
+                            "--owner=0",
+                            "--group=0",
+                            "--mtime=1970-01-01",
+                        });
+                    },
+                }
+            }
+
+            for (compressed_artifacts.keys(), compressed_artifacts.values()) |file_name, file_path| {
+                const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
+                const install_tarball = b.addInstallFileWithDir(file_path, install_dir, file_name);
+                release_step.dependOn(&install_tarball.step);
+            }
         }
     }
 }
