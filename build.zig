@@ -75,6 +75,7 @@ pub fn build(b: *std.Build) void {
             const is_windows = release_target.os_tag == .windows;
             const exe_name = b.fmt("{s}{s}", .{ exe.name, resolved_target.result.exeFileExt() });
 
+            const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
             const extensions: []const FileExtension = if (is_windows) &.{.zip} else &.{.@"tar.gz"};
             for (extensions) |extension| {
                 const file_name = b.fmt("love-{t}-{t}.{t}", .{
@@ -85,10 +86,7 @@ pub fn build(b: *std.Build) void {
 
                 const compress_cmd = std.Build.Step.Run.create(b, "compress artifact");
                 compress_cmd.clearEnvironment();
-                compress_cmd.step.max_rss = switch (extension) {
-                    .zip => 160 * 1024 * 1024, // 160 MiB
-                    .@"tar.gz" => 16 * 1024 * 1024, // 12 MiB
-                };
+                compress_cmd.step.max_rss = 16 * 1024 * 1024; // 16 MiB
 
                 switch (extension) {
                     .zip => {
@@ -98,7 +96,6 @@ pub fn build(b: *std.Build) void {
                     },
                     .@"tar.gz",
                     => {
-                        compress_cmd.setEnvironmentVariable("XZ_OPT", "-9");
                         compress_cmd.addArgs(&.{ "tar", "caf" });
                         compressed_artifacts.putNoClobber(b.allocator, file_name, compress_cmd.addOutputFileArg(file_name)) catch @panic("OOM");
                         compress_cmd.addPrefixedDirectoryArg("-C", exe_release.getEmittedBinDirectory());
@@ -114,8 +111,8 @@ pub fn build(b: *std.Build) void {
                 }
             }
 
+            const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
             for (compressed_artifacts.keys(), compressed_artifacts.values()) |file_name, file_path| {
-                const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
                 const install_tarball = b.addInstallFileWithDir(file_path, install_dir, file_name);
                 release_step.dependOn(&install_tarball.step);
             }
