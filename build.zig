@@ -59,7 +59,7 @@ pub fn build(b: *std.Build) void {
 
     { // zig build release
         const release_step = b.step("release", "Build release binaries");
-        var compressed_artifacts: std.StringArrayHashMapUnmanaged(std.Build.LazyPath) = .empty;
+        const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
         for (release_targets) |release_target| {
             const resolved_target = b.resolveTargetQuery(release_target);
             const exe_release = b.addExecutable(.{
@@ -75,29 +75,33 @@ pub fn build(b: *std.Build) void {
             const is_windows = release_target.os_tag == .windows;
             const exe_name = b.fmt("{s}{s}", .{ exe.name, resolved_target.result.exeFileExt() });
 
-            const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
+            // An array has been created for possible extensions to new types of archives.
             const extensions: []const FileExtension = if (is_windows) &.{.zip} else &.{.@"tar.gz"};
+            var file_path: std.Build.LazyPath = undefined;
             for (extensions) |extension| {
+                // archive file name
                 const file_name = b.fmt("love-{t}-{t}.{t}", .{
                     resolved_target.result.cpu.arch,
                     resolved_target.result.os.tag,
                     extension,
                 });
 
+                // creating a command inside the project build step
                 const compress_cmd = std.Build.Step.Run.create(b, "compress artifact");
+                // init command properties
                 compress_cmd.clearEnvironment();
                 compress_cmd.step.max_rss = 16 * 1024 * 1024; // 16 MiB
 
+                // Building the compress command line
                 switch (extension) {
                     .zip => {
                         compress_cmd.addArgs(&.{ "7z", "a", "-mx=9" });
-                        compressed_artifacts.putNoClobber(b.allocator, file_name, compress_cmd.addOutputFileArg(file_name)) catch @panic("OOM");
+                        file_path = compress_cmd.addOutputFileArg(file_name);
                         compress_cmd.addArtifactArg(exe_release);
                     },
-                    .@"tar.gz",
-                    => {
+                    .@"tar.gz" => {
                         compress_cmd.addArgs(&.{ "tar", "caf" });
-                        compressed_artifacts.putNoClobber(b.allocator, file_name, compress_cmd.addOutputFileArg(file_name)) catch @panic("OOM");
+                        file_path = compress_cmd.addOutputFileArg(file_name);
                         compress_cmd.addPrefixedDirectoryArg("-C", exe_release.getEmittedBinDirectory());
                         compress_cmd.addArg(exe_name);
                         compress_cmd.addArgs(&.{
@@ -105,16 +109,13 @@ pub fn build(b: *std.Build) void {
                             "--numeric-owner",
                             "--owner=0",
                             "--group=0",
-                            "--mtime=1970-01-01",
                         });
                     },
                 }
-            }
 
-            const install_dir: std.Build.InstallDir = .{ .custom = "compressed" };
-            for (compressed_artifacts.keys(), compressed_artifacts.values()) |file_name, file_path| {
-                const install_tarball = b.addInstallFileWithDir(file_path, install_dir, file_name);
-                release_step.dependOn(&install_tarball.step);
+                // The artifact install to zig-out/compressed directory
+                const install_compressed = b.addInstallFileWithDir(file_path, install_dir, file_name);
+                release_step.dependOn(&install_compressed.step);
             }
         }
     }
