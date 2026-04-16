@@ -10,29 +10,25 @@ const CP_UTF8 = 65001;
 ///
 /// If you pass a parameter with a name, the phrase will include that name.
 /// For example: "I love you, Jane!".
-pub fn main() !void {
-    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    defer arena.deinit();
-    const allocator = arena.allocator();
+pub fn main(init: std.process.Init) !void {
+    const allocator = init.arena.allocator();
 
     var stdout_buffer: [1024]u8 = undefined;
-    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
     const stdout = &stdout_writer.interface;
 
     // Get the System Locale or default to en_US
-    const lang = locale.getLocale(allocator) catch |err| switch (err) {
+    const lang = locale.getLocale(init) catch |err| switch (err) {
         error.OutOfMemory => return err,
-        else => try allocator.dupe(u8, "en_US"),
+        else => try init.gpa.dupe(u8, "en_US"),
     };
-    defer allocator.free(lang);
+    defer init.gpa.free(lang);
 
     // Get the Message by the System Locale
     const message = messages.getMessageByLocale(lang);
 
     // Get the arguments
-    const args = try std.process.argsAlloc(allocator);
-    defer std.process.argsFree(allocator, args);
-
+    const args = try init.minimal.args.toSlice(allocator);
     if (builtin.os.tag == .windows) {
         _ = std.os.windows.kernel32.SetConsoleOutputCP(CP_UTF8);
     }

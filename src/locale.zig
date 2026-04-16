@@ -12,31 +12,31 @@ const LocaleError = error{
 };
 
 // Get the locale
-pub fn getLocale(allocator: Allocator) LocaleError![]u8 {
+pub fn getLocale(init: std.process.Init) LocaleError![]u8 {
     switch (builtin.os.tag) {
-        .linux => return getLinuxLocale(allocator),
-        .macos => return getMacLocale(allocator),
-        .windows => return getWindowsLocale(allocator),
+        .linux => return getLinuxLocale(init),
+        .macos => return getMacLocale(init),
+        .windows => return getWindowsLocale(init),
         else => return LocaleError.BadOS,
     }
 }
 
 // Get the locale on Linux
-pub fn getLinuxLocale(allocator: Allocator) LocaleError![]u8 {
+pub fn getLinuxLocale(init: std.process.Init) LocaleError![]u8 {
     if (builtin.os.tag != .linux) {
         return LocaleError.BadOS;
     }
 
     const envs = [_][]const u8{ "LANGUAGE", "LANG", "LC_ALL", "LC_MESSAGES" };
     for (envs) |env| {
-        if (std.posix.getenv(env)) |value| {
+        if (init.environ_map.get(env)) |value| {
             if (value.len == 0) continue;
             // LANGUAGE may contain multiple locales separated by ':'
             const first = if (std.mem.indexOf(u8, value, ":")) |colon| value[0..colon] else value;
             // Strip encoding suffix after '.'
             const dot = std.mem.indexOf(u8, first, ".");
             const locale = if (dot) |d| first[0..d] else first;
-            return try allocator.dupe(u8, locale);
+            return try init.gpa.dupe(u8, locale);
         }
     }
 
@@ -44,17 +44,17 @@ pub fn getLinuxLocale(allocator: Allocator) LocaleError![]u8 {
 }
 
 // Get the locale on Mac
-pub fn getMacLocale(allocator: Allocator) LocaleError![]u8 {
+pub fn getMacLocale(init: std.process.Init) LocaleError![]u8 {
     if (builtin.os.tag != .macos) {
         return LocaleError.BadOS;
     }
 
     const envs = [_][]const u8{ "LANG", "LANGUAGE", "LC_ALL", "LC_MESSAGES" };
     for (envs) |env| {
-        if (std.posix.getenv(env)) |value| {
+        if (init.environ_map.get(env)) |value| {
             const pos = std.mem.indexOf(u8, value, ".");
             const locale = if (pos) |p| value[0..p] else value;
-            return try allocator.dupe(u8, locale);
+            return try init.gpa.dupe(u8, locale);
         }
     }
 
@@ -62,7 +62,7 @@ pub fn getMacLocale(allocator: Allocator) LocaleError![]u8 {
 }
 
 // Get the locale on Windows
-pub fn getWindowsLocale(allocator: Allocator) LocaleError![]u8 {
+pub fn getWindowsLocale(init: std.process.Init) LocaleError![]u8 {
     if (builtin.os.tag != .windows) {
         return LocaleError.BadOS;
     }
@@ -76,7 +76,7 @@ pub fn getWindowsLocale(allocator: Allocator) LocaleError![]u8 {
         const utf8_len = std.unicode.utf16LeToUtf8(&locale_str, locale[0..utf16_len]) catch unreachable;
         const slice = locale_str[0 .. utf8_len - 1]; // remove :0 terminator of string
         std.mem.replaceScalar(u8, slice, '-', '_');
-        return try allocator.dupe(u8, slice);
+        return try init.gpa.dupe(u8, slice);
     }
 
     return LocaleError.BadLocale;
