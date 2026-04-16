@@ -3,7 +3,7 @@ const builtin = @import("builtin");
 const locale = @import("locale.zig");
 const messages = @import("messages.zig");
 
-const CP_UTF8 = 65001;
+extern "kernel32" fn SetConsoleOutputCP(wCodePageID: std.os.windows.UINT) callconv(.winapi) std.os.windows.BOOL;
 
 /// A simple joke utility that does only one thing — after launching,
 /// it outputs the phrase "I love you!" to the console.
@@ -28,7 +28,8 @@ pub fn main(init: std.process.Init) !void {
     // Get the arguments
     const args = try init.minimal.args.toSlice(init.arena.allocator());
     if (builtin.os.tag == .windows) {
-        _ = std.os.windows.kernel32.SetConsoleOutputCP(CP_UTF8);
+        const CP_UTF8 = 65001;
+        _ = SetConsoleOutputCP(CP_UTF8);
     }
 
     if (args.len > 1) {
