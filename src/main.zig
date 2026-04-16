@@ -11,8 +11,6 @@ const CP_UTF8 = 65001;
 /// If you pass a parameter with a name, the phrase will include that name.
 /// For example: "I love you, Jane!".
 pub fn main(init: std.process.Init) !void {
-    const allocator = init.arena.allocator();
-
     var stdout_buffer: [1024]u8 = undefined;
     var stdout_writer = std.Io.File.stdout().writer(init.io, &stdout_buffer);
     const stdout = &stdout_writer.interface;
@@ -28,7 +26,7 @@ pub fn main(init: std.process.Init) !void {
     const message = messages.getMessageByLocale(lang);
 
     // Get the arguments
-    const args = try init.minimal.args.toSlice(allocator);
+    const args = try init.minimal.args.toSlice(init.arena.allocator());
     if (builtin.os.tag == .windows) {
         _ = std.os.windows.kernel32.SetConsoleOutputCP(CP_UTF8);
     }
