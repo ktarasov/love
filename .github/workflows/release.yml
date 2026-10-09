@@ -1,0 +1,82 @@
+name: Release
+
+# Запуск при пуше нового тега вида v0.0.5, v1.2.3 и т.п.
+on:
+  push:
+    tags:
+      - "v*"
+
+# Для создания черновика релиза нужна запись в contents
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Версия Zig для CI; должна соответствовать minimum_zig_version в build.zig.zon
+  ZIG_VERSION: "0.17.0"
+
+jobs:
+  release:
+    name: Build and draft release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve tag name
+        id: tag
+        run: echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+
+      # 1) Проверка наличия RELEASE_NOTES_<tag>.md (например, RELEASE_NOTES_v0.0.5.md)
+      - name: Check RELEASE_NOTES exists
+        run: |
+          notes="RELEASE_NOTES_${{ steps.tag.outputs.tag }}.md"
+          if [ ! -f "$notes" ]; then
+            echo "::error::Файл $notes не найден в корне репозитория."
+            echo "::error::Создайте release notes для тега ${{ steps.tag.outputs.tag }} и запушьте тег заново."
+            exit 1
+          fi
+          echo "Найдены release notes: $notes"
+
+      # 2) Сборка релизных артефактов (zig build release)
+      - name: Setup Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: ${{ env.ZIG_VERSION }}
+
+      - name: Install 7zip (требуется для сборки .zip)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends p7zip-full
+
+      - name: Build release artifacts
+        run: zig build release
+        env:
+          # Воспроизводимость сборки
+          ZIG_GLOBAL_CACHE_DIR: .zig-global-cache
+          ZIG_LOCAL_CACHE_DIR: .zig-local-cache
+
+      - name: Verify artifacts
+        run: |
+          ls -l zig-out/compressed
+          test -n "$(find zig-out/compressed -type f -name 'love-*' -print -quit)" || {
+            echo "::error::Релизные артефакты не найдены в zig-out/compressed"
+            exit 1
+          }
+
+      # 3) Черновик релиза: описание из RELEASE_NOTES_<tag>.md + вложенные артефакты
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: Release ${{ steps.tag.outputs.tag }}
+          draft: true
+          prerelease: false
+          generate_release_notes: false
+          body_path: RELEASE_NOTES_${{ steps.tag.outputs.tag }}.md
+          files: zig-out/compressed/*
+          fail_on_unmatched_files: true
