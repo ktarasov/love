@@ -1,0 +1,250 @@
+/* The Love — GitHub Pages landing */
+
+:root {
+  --bg: #12101a;
+  --bg-alt: #1a1726;
+  --fg: #efeaf6;
+  --fg-dim: #a89fbe;
+  --accent: #ff4d6d;
+  --accent-soft: rgba(255, 77, 109, 0.15);
+  --border: #2e2840;
+  --radius: 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Hero */
+
+.hero {
+  background:
+    radial-gradient(ellipse 60% 80% at 50% -20%, var(--accent-soft), transparent),
+    var(--bg);
+  text-align: center;
+  padding: 5rem 0 3.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  letter-spacing: 0.02em;
+}
+
+.heart {
+  color: var(--accent);
+}
+
+.tagline {
+  margin: 1rem auto 0.25rem;
+  font-size: 1.15rem;
+  max-width: 42rem;
+}
+
+.tagline-ru {
+  color: var(--fg-dim);
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+/* Buttons */
+
+.download-buttons {
+  margin-top: 2rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.7rem 1.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-alt);
+  color: var(--fg);
+  font-weight: 600;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-sub {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+/* Sections */
+
+section {
+  padding: 2.5rem 0;
+}
+
+section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.note {
+  margin-top: 1rem;
+  color: var(--fg-dim);
+  font-size: 0.95rem;
+}
+
+code {
+  font-family: ui-monospace, "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-size: 0.9em;
+}
+
+/* Terminal demo */
+
+.terminal {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg-alt);
+}
+
+.terminal-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.terminal-bar span {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.terminal-bar span:first-child {
+  background: var(--accent);
+}
+
+.terminal-bar em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.8rem;
+  color: var(--fg-dim);
+}
+
+.terminal pre {
+  padding: 1.1rem 1.25rem;
+  overflow-x: auto;
+}
+
+.terminal code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* Features */
+
+.features {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 0.75rem;
+}
+
+.features li {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+}
+
+/* Downloads grid */
+
+.downloads {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+}
+
+.downloads a {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1.1rem;
+  color: var(--fg);
+  font-weight: 600;
+  transition: border-color 0.15s;
+}
+
+.downloads a:hover {
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+.downloads span {
+  font-weight: 400;
+  font-size: 0.85rem;
+  color: var(--fg-dim);
+}
+
+/* Footer */
+
+footer {
+  border-top: 1px solid var(--border);
+  padding: 1.5rem 0 2rem;
+  text-align: center;
+  color: var(--fg-dim);
+  font-size: 0.9rem;
+  margin-top: 2rem;
+}
