@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const TargetQuery = std.Target.Query;
 
 const release_targets = [_]TargetQuery{
@@ -45,8 +46,14 @@ pub fn build(b: *std.Build) void {
     const run_cmd = b.addRunArtifact(exe);
     run_step.dependOn(&run_cmd.step);
 
-    if (b.args) |args| {
-        run_cmd.addArgs(args);
+    // Zig 0.17+ replaced b.args with addPassthruArgs().
+    // Zig 0.16 still uses the b.args field.
+    if (comptime builtin.zig_version.minor >= 17) {
+        run_cmd.addPassthruArgs();
+    } else {
+        if (b.args) |args| {
+            run_cmd.addArgs(args);
+        }
     }
 
     const exe_tests = b.addTest(.{
