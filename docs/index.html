@@ -1,37 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Love — a simple joke utility written in Zig</title>
-  <meta name="description" content="A simple joke utility that outputs 'I love you!' to the console. Written in Zig, cross-platform: Linux, Windows, macOS.">
-  <meta name="yandex-verification" content="5ebb73162f489d14">
-  <link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Love — a simple joke utility written in Zig</title>
+    <meta name="description"
+        content="A simple joke utility that outputs 'I love you!' to the console. Written in Zig, cross-platform: Linux, Windows, macOS.">
+    <meta name="yandex-verification" content="5ebb73162f489d14">
+    <link rel="stylesheet" href="./style.css">
 </head>
+
 <body>
 
-  <header class="hero">
-    <div class="container">
-      <h1>The&nbsp;Love<span class="heart">&hearts;</span></h1>
-      <p class="tagline">A simple joke utility that does only one thing —
-        after launching, it outputs the phrase <strong>&laquo;I love you!&raquo;</strong> to the console.</p>
-      <p class="tagline-ru">Простая шуточная утилита, которая делает только одно — выводит в консоль фразу «Я люблю тебя!».</p>
+    <header class="hero">
+        <div class="container">
+            <h1>The&nbsp;Love<span class="heart">&hearts;</span></h1>
+            <p class="tagline">A simple joke utility that does only one thing —
+                after launching, it outputs the phrase <strong>&laquo;I love you!&raquo;</strong> to the console.</p>
+            <p class="tagline-ru">Простая шуточная утилита, которая делает только одно — выводит в консоль фразу «Я
+                люблю тебя!».</p>
 
-      <div class="download-buttons">
-        <a class="btn btn-primary" href="https://github.com/ktarasov/love/releases/latest"
-           title="All releases">Download <span class="btn-sub">latest release</span></a>
-        <a class="btn" href="https://github.com/ktarasov/love" title="Source code on GitHub">View on GitHub</a>
-      </div>
-    </div>
-  </header>
+            <div class="download-buttons">
+                <a class="btn btn-primary" href="https://github.com/ktarasov/love/releases/latest"
+                    title="All releases">Download <span class="btn-sub">latest release</span></a>
+                <a class="btn" href="https://github.com/ktarasov/love" title="Source code on GitHub">View on GitHub</a>
+            </div>
+        </div>
+    </header>
 
-  <main class="container">
+    <main class="container">
 
-    <section id="usage">
-      <h2>Usage</h2>
-      <div class="terminal">
-        <div class="terminal-bar"><span></span><span></span><span></span><em>console</em></div>
-        <pre><code>$ love
+        <section id="usage">
+            <h2>Usage</h2>
+            <div class="terminal">
+                <div class="terminal-bar"><span></span><span></span><span></span><em>console</em></div>
+                <pre><code>$ love
 I love you!
 
 $ love Jane
@@ -39,46 +43,65 @@ I love you, Jane!
 
 $ love &Kcy;&acy;&rcy;&iecy;&ncy;
 Я люблю тебя, Карен!</code></pre>
-      </div>
-      <p class="note">The system locale is detected automatically — English and Russian are built in.
-      On Windows, the console code page is switched to UTF-8 automatically.</p>
-    </section>
+            </div>
+            <p class="note">The system locale is detected automatically — English and Russian are built in.
+                On Windows, the console code page is switched to UTF-8 automatically.</p>
+        </section>
 
-    <section id="features">
-      <h2>Features</h2>
-      <ul class="features">
-        <li><strong>Written in <a href="https://ziglang.org/">Zig</a></strong> — requires Zig 0.17.0 or later</li>
-        <li><strong>Locale-aware</strong> — localizes the output automatically (English and Russian built in)</li>
-        <li><strong>Cross-platform</strong> — Linux, Windows and macOS (x86_64 and aarch64 for macOS)</li>
-        <li><strong>Tiny</strong> — built with <code>ReleaseSmall</code></li>
-      </ul>
-    </section>
+        <section id="features">
+            <h2>Features</h2>
+            <ul class="features">
+                <li><strong>Written in <a href="https://ziglang.org/">Zig</a></strong> — requires Zig 0.17.0 or later
+                </li>
+                <li><strong>Locale-aware</strong> — localizes the output automatically (English and Russian built in)
+                </li>
+                <li><strong>Cross-platform</strong> — Linux, Windows and macOS (x86_64 and aarch64 for macOS)</li>
+                <li><strong>Tiny</strong> — built with <code>ReleaseSmall</code></li>
+            </ul>
+        </section>
 
-    <section id="download">
-      <h2>Downloads</h2>
-      <p>Prebuilt archives are attached to every release:</p>
-      <div class="downloads">
-        <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-linux.tar.gz">
-          Linux <span>x86_64 &middot; tar.gz</span></a>
-        <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-windows.zip">
-          Windows <span>x86_64 &middot; zip</span></a>
-        <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-macos.tar.gz">
-          macOS (Intel) <span>x86_64 &middot; tar.gz</span></a>
-        <a href="https://github.com/ktarasov/love/releases/latest/download/love-aarch64-macos.tar.gz">
-          macOS (Apple Silicon) <span>aarch64 &middot; tar.gz</span></a>
-      </div>
-      <p class="note">Unpack the archive and run the <code>love</code> binary.
-      See the <a href="https://github.com/ktarasov/love#readme">README</a> for build instructions.</p>
-    </section>
+        <section id="download">
+            <h2>Downloads</h2>
+            <p>Prebuilt archives are attached to every release:</p>
+            <div class="downloads">
+                <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-linux.tar.gz">
+                    Linux <span>x86_64 &middot; tar.gz</span></a>
+                <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-windows.zip">
+                    Windows <span>x86_64 &middot; zip</span></a>
+                <a href="https://github.com/ktarasov/love/releases/latest/download/love-x86_64-macos.tar.gz">
+                    macOS (Intel) <span>x86_64 &middot; tar.gz</span></a>
+                <a href="https://github.com/ktarasov/love/releases/latest/download/love-aarch64-macos.tar.gz">
+                    macOS (Apple Silicon) <span>aarch64 &middot; tar.gz</span></a>
+            </div>
+            <p class="note">Unpack the archive and run the <code>love</code> binary.
+                See the <a href="https://github.com/ktarasov/love#readme">README</a> for build instructions.</p>
+        </section>
 
-  </main>
+    </main>
 
-  <footer>
-    <div class="container">
-      <p>The Love &mdash; MIT licensed. Made with <span class="heart">&hearts;</span> and
-        <a href="https://ziglang.org/">Zig</a>.</p>
-    </div>
-  </footer>
+    <footer>
+        <div class="container">
+            <p>The Love &mdash; MIT licensed. Made with <span class="heart">&hearts;</span> and
+                <a href="https://ziglang.org/">Zig</a>.
+            </p>
+        </div>
+    </footer>
 
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (m, e, t, r, i, k, a) {
+            m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+            m[i].l = 1 * new Date();
+            for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+            k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+        })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=113580039', 'ym');
+
+        ym(113580039, 'init', { ssr: true, webvisor: true, clickmap: true, ecommerce: "dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce: true, trackLinks: true });
+    </script>
+    <noscript>
+        <div><img src="https://mc.yandex.ru/watch/113580039" style="position:absolute; left:-9999px;" alt="" /></div>
+    </noscript>
+    <!-- /Yandex.Metrika counter -->
 </body>
+
 </html>
