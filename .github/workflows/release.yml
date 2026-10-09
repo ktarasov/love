@@ -73,7 +73,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          name: Release ${{ steps.tag.outputs.tag }}
+          name: The Love ${{ steps.tag.outputs.tag }}
           draft: true
           prerelease: false
           generate_release_notes: false
